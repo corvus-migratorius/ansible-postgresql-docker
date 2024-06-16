@@ -1,7 +1,7 @@
-template
+ansible-postgres-docker
 =========
 
-Template for Ansible role monorepos
+Ansible role deploying a PostgreSQL server in a Docker container.
 
 Requirements
 ------------
@@ -23,7 +23,7 @@ Example Playbook
 
 ```yaml
 roles:
-    - role: genlab.template
+    - role: genlab.ansible_postgres_docker
 ```
 
 License

@@ -1,4 +1,51 @@
 ---
-- name: "Mock task"
-  ansible.builtin.debug:
-    msg: "hello, world!"
+- name: "Get Docker version"
+  changed_when: false
+  ansible.builtin.command:
+    cmd: docker --version
+
+- name: "Check that Docker Compose is available"
+  changed_when: false
+  ansible.builtin.command:
+    cmd: docker compose --version
+
+- name: "Create project directories"
+  loop:
+    - { name: "{{ project_root }}", owner: "root", group: "root", mode: "0770" }
+    - { name: "{{ project_root }}/secrets", owner: "root", group: "root", mode: "0770" }
+    - { name: "{{ db_data_dir }}", owner: "999", group: "999", mode: "0700" }
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.name }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "Template the Compose file"
+  notify: "Re-create PostgreSQL container"
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: "{{ project_root }}/docker-compose.yaml"
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: "Copy db secret files"
+  notify: "Re-create PostgreSQL container"
+  loop:
+    - {src: "{{ secrets_dir }}/user-name.txt", dest: "{{ project_root }}/secrets/user-name.txt"}
+    - {src: "{{ secrets_dir }}/user-password.txt", dest: "{{ project_root }}/secrets/user-password.txt"}
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+# - name: "Spin-up PostgreSQL container"
+#   community.docker.docker_compose_v2:
+#     project_src: "{{ project_root }}"
+#     files:
+#       - docker-compose.yaml
+#     tls_hostname: localhost
+#     state: present

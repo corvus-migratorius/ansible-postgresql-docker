@@ -5,6 +5,11 @@
   any_errors_fatal: true
 
   tasks:
+    - name: "Include default vars"
+      ansible.builtin.include_vars:
+        dir: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/"
+        extensions: [ 'yml' ]
+
     - name: "Mock verification task"
       changed_when: false
       ansible.builtin.command:
