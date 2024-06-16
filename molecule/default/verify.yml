@@ -27,7 +27,7 @@
 
     - name: "Verify that correct PostgreSQL version is installed"
       ansible.builtin.assert:
-        that: version == version_verify.version.full
+        that: (version | string) == version_verify.version.full
         success_msg: >
           Detected expected PostgreSQL version
           ({{ version_verify.version.full }})
