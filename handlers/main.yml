@@ -1,1 +1,9 @@
 ---
+- name: "Re-create PostgreSQL container"
+  community.docker.docker_compose_v2:
+    project_src: "{{ project_root }}"
+    files:
+      - docker-compose.yaml
+    tls_hostname: localhost
+    state: present
+    recreate: always

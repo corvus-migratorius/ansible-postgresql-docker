@@ -1,0 +1,28 @@
+---
+services:
+
+  postgres-server:
+    image: "postgres:{{ version }}-bullseye"  # version compatible with the backups image
+    hostname: postgres
+    container_name: postgres
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "postgres-data:/var/lib/postgresql/data:rw"
+      - "{{ project_root }}/secrets/:/run/secrets/:ro"
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/user-name.txt
+      POSTGRES_PASSWORD_FILE: /run/secrets/user-password.txt
+      POSTGRES_DB: "{{ db_name }}"
+      PGPORT: "{{ db_port }}"
+      TZ: "GMT+3"
+      PGTZ: "GMT+3"
+
+volumes:
+  postgres-data:
+    name: "postgres-data"
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "{{ db_data_dir }}"
