@@ -51,3 +51,6 @@
   ansible.builtin.pip:
     name: psycopg2-binary
     state: present
+
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers
